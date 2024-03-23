@@ -54,7 +54,6 @@ const Whiteboard = () => {
     id: string;
   }>(null);
   const [prevMousePosition, setPrevMousePosition] = useState({ x: 0, y: 0 });
-  const [drawing, setDrawing] = useState(false);
   const [selecting, setSelecting] = useState(false);
   const [startPoint, setStartPoint] = useState({ x: 0, y: 0 });
   const [endPoint, setEndPoint] = useState({ x: 0, y: 0 });
@@ -281,8 +280,6 @@ const Whiteboard = () => {
         newItems = newItems;
       }
 
-      setDrawing(false);
-
       setUndoStack([...undoStack, newItems]);
 
       return newItems;
@@ -377,8 +374,6 @@ const Whiteboard = () => {
         setDraggingView(true);
         setDragStartPoint({ x: e.clientX, y: e.clientY });
       }
-
-      setDrawing(false);
     },
     [
       canvasRef,
@@ -677,7 +672,7 @@ const Whiteboard = () => {
         ctx.setLineDash([]);
       });
 
-      if (selecting || drawing) {
+      if (selecting) {
         ctx.strokeStyle = "black";
         ctx.lineWidth = 2;
         ctx.strokeRect(
@@ -694,15 +689,7 @@ const Whiteboard = () => {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [
-    selectedRects,
-    startPoint,
-    endPoint,
-    items,
-    drawing,
-    viewOffset,
-    selecting,
-  ]);
+  }, [selectedRects, startPoint, endPoint, items, viewOffset, selecting]);
 
   return (
     <div className="flex">
