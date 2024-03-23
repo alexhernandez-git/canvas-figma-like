@@ -522,7 +522,6 @@ const Whiteboard = () => {
       }
 
       setItems(newItems);
-      setUndoStack([...undoStack, newItems]);
     },
     [
       items,
@@ -531,7 +530,6 @@ const Whiteboard = () => {
       draggingView,
       determineCursorType,
       resizeDirection,
-      undoStack,
       handleSelectItem,
       dragStartPoint.x,
       dragStartPoint.y,
