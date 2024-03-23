@@ -405,11 +405,9 @@ const Whiteboard = () => {
       setResizeDirection(null);
     }
 
-    setUndoStack([...undoStack, items]);
-
     setStartPoint({ x: 0, y: 0 });
     setEndPoint({ x: 0, y: 0 });
-  }, [selecting, dragging, resizeDirection, undoStack, items]);
+  }, [selecting, dragging, resizeDirection]);
 
   const handleMouseMove = useCallback(
     (e) => {
