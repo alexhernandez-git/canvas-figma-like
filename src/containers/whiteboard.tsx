@@ -20,7 +20,6 @@ const Whiteboard = () => {
       height: 100,
       selected: false,
       permanentSelection: false,
-      text: null,
       fontSize: 20,
     },
 
@@ -32,7 +31,6 @@ const Whiteboard = () => {
       height: 100,
       selected: false,
       permanentSelection: false,
-      text: null,
       fontSize: 20,
     },
 
@@ -44,7 +42,6 @@ const Whiteboard = () => {
       height: 100,
       selected: false,
       permanentSelection: false,
-      text: null,
       fontSize: 20,
     },
   ]);
