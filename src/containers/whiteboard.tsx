@@ -277,11 +277,9 @@ const Whiteboard = () => {
         newItems = newItems;
       }
 
-      setUndoStack([newItems, ...undoStack]);
-
       return newItems;
     },
-    [getCurrentRectangles, getLargestRect, items, undoStack]
+    [getCurrentRectangles, getLargestRect, items]
   );
 
   const handleMouseDown = useCallback(
@@ -404,7 +402,8 @@ const Whiteboard = () => {
 
     setStartPoint({ x: 0, y: 0 });
     setEndPoint({ x: 0, y: 0 });
-  }, [selecting, dragging, resizeDirection]);
+    setUndoStack([...undoStack, items]);
+  }, [selecting, dragging, resizeDirection, undoStack, items]);
 
   const handleMouseMove = useCallback(
     (e) => {
@@ -515,7 +514,6 @@ const Whiteboard = () => {
         });
         setPrevMousePosition({ x: offsetX, y: offsetY });
       }
-      setUndoStack([...undoStack, newItems]);
       setItems(newItems);
     },
     [
@@ -525,7 +523,6 @@ const Whiteboard = () => {
       draggingView,
       determineCursorType,
       resizeDirection,
-      undoStack,
       handleSelectItem,
       dragStartPoint.x,
       dragStartPoint.y,
@@ -596,9 +593,8 @@ const Whiteboard = () => {
       });
 
       setItems(newItems);
-      setUndoStack([...undoStack, newItems]);
     },
-    [getCurrentRectangles, getLargestRect, items, undoStack]
+    [getCurrentRectangles, getLargestRect, items]
   );
 
   useEffect(() => {
