@@ -277,7 +277,7 @@ const Whiteboard = () => {
         newItems = newItems;
       }
 
-      setUndoStack([...undoStack, newItems]);
+      setUndoStack([newItems, ...undoStack]);
 
       return newItems;
     },
@@ -322,7 +322,6 @@ const Whiteboard = () => {
       const xDiff = e.clientX - rect.left;
       const yDiff = e.clientY - rect.top;
 
-      setUndoStack([...undoStack, newItems]);
       setItems(newItems);
 
       newItems.forEach((selectedRect) => {
@@ -377,7 +376,6 @@ const Whiteboard = () => {
       getCurrentRectangles,
       getLargestRect,
       items,
-      setUndoStack,
       setItems,
       setPrevMousePosition,
       setResizeDirection,
@@ -388,7 +386,6 @@ const Whiteboard = () => {
       setDraggingView,
       setDragStartPoint,
       viewOffset,
-      undoStack,
     ]
   );
 
@@ -518,7 +515,7 @@ const Whiteboard = () => {
         });
         setPrevMousePosition({ x: offsetX, y: offsetY });
       }
-
+      setUndoStack([...undoStack, newItems]);
       setItems(newItems);
     },
     [
@@ -528,6 +525,7 @@ const Whiteboard = () => {
       draggingView,
       determineCursorType,
       resizeDirection,
+      undoStack,
       handleSelectItem,
       dragStartPoint.x,
       dragStartPoint.y,
