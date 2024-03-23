@@ -244,12 +244,12 @@ const Whiteboard = () => {
   const handleSelectItem = useCallback(
     (e, mouseDown = false) => {
       let currRects = getCurrentRectangles(e);
-      let newIte = items;
+      let newItems = items;
       // Find the rectangle with the smallest width and height
       const smallestRect = getLargestRect(currRects);
 
       // Update the selected state of rectangles
-      newIte = items.map((rect) => {
+      newItems = items.map((rect) => {
         let selected =
           (smallestRect && smallestRect.id === rect.id) ||
           rect.permanentSelection;
@@ -263,7 +263,7 @@ const Whiteboard = () => {
 
       if (e.shiftKey) {
         // If shift key is pressed, add selected rectangles to the current selection
-        const selectedRectangles = newIte.filter((rect) => rect.selected);
+        const selectedRectangles = newItems.filter((rect) => rect.selected);
         const combinedRects = items.map((rect) => {
           const isSelected = selectedRectangles.some(
             (selRec) => selRec?.id === rect?.id
@@ -274,18 +274,18 @@ const Whiteboard = () => {
             permanentSelection: rect.selected || isSelected,
           };
         });
-        newIte = combinedRects;
+        newItems = combinedRects;
       } else {
         // If shift key is not pressed, replace the selection with the new selection
         // eslint-disable-next-line no-self-assign
-        newIte = newIte;
+        newItems = newItems;
       }
 
       setDrawing(false);
 
-      setUndoStack([...undoStack, newIte]);
+      setUndoStack([...undoStack, newItems]);
 
-      return newIte;
+      return newItems;
     },
     [getCurrentRectangles, getLargestRect, items, undoStack]
   );
@@ -301,14 +301,14 @@ const Whiteboard = () => {
       const smallestRect = getLargestRect(currRects);
 
       // Update the selected state of rectangles
-      let newIte = items.map((rect) => {
+      let newItems = items.map((rect) => {
         const selected = smallestRect && smallestRect.id === rect.id;
         return { ...rect, selected, permanentSelection: selected };
       });
 
       if (e.shiftKey) {
         // If shift key is pressed, add selected rectangles to the current selection
-        const selectedRectangles = newIte.filter((rect) => rect.selected);
+        const selectedRectangles = newItems.filter((rect) => rect.selected);
         const combinedRects = items.map((rect) => {
           const isSelected = selectedRectangles.some(
             (selRec) => selRec?.id === rect?.id
@@ -319,7 +319,7 @@ const Whiteboard = () => {
             permanentSelection: rect.selected || isSelected,
           };
         });
-        newIte = combinedRects;
+        newItems = combinedRects;
       }
 
       let { offsetX, offsetY } = e.nativeEvent;
@@ -328,10 +328,10 @@ const Whiteboard = () => {
       const xDiff = e.clientX - rect.left;
       const yDiff = e.clientY - rect.top;
 
-      setUndoStack([...undoStack, newIte]);
-      setItems(newIte);
+      setUndoStack([...undoStack, newItems]);
+      setItems(newItems);
 
-      newIte.forEach((selectedRect) => {
+      newItems.forEach((selectedRect) => {
         if (selectedRect) {
           const { x, y, width, height, id } = selectedRect;
 
@@ -421,10 +421,10 @@ const Whiteboard = () => {
 
   const handleMouseMove = useCallback(
     (e) => {
-      let newIte = items;
+      let newItems = items;
 
       if (!dragging && !selecting) {
-        newIte = handleSelectItem(e);
+        newItems = handleSelectItem(e);
       }
 
       if (draggingView) {
@@ -449,7 +449,7 @@ const Whiteboard = () => {
 
         setEndPoint({ x, y });
 
-        newIte = setSelectedRectangles(newIte);
+        newItems = setSelectedRectangles(newItems);
       }
 
       determineCursorType(e);
@@ -461,7 +461,7 @@ const Whiteboard = () => {
         const deltaX = offsetX - prevMousePosition.x;
         const deltaY = offsetY - prevMousePosition.y;
 
-        newIte = newIte.map((rect) => {
+        newItems = newItems.map((rect) => {
           if (rect.selected) {
             let newX = rect.x;
             let newY = rect.y;
@@ -529,19 +529,21 @@ const Whiteboard = () => {
         setPrevMousePosition({ x: offsetX, y: offsetY });
       }
 
-      setItems(newIte);
+      setItems(newItems);
+      setUndoStack([...undoStack, newItems]);
     },
     [
       items,
-      selecting,
       dragging,
+      selecting,
       draggingView,
       determineCursorType,
       resizeDirection,
-      setSelectedRectangles,
+      undoStack,
       handleSelectItem,
       dragStartPoint.x,
       dragStartPoint.y,
+      setSelectedRectangles,
       viewOffset.x,
       viewOffset.y,
       prevMousePosition.x,
@@ -550,8 +552,10 @@ const Whiteboard = () => {
   );
 
   const handleRemoveSelected = useCallback(() => {
-    setItems(items.filter((rect) => !rect.selected));
-  }, [setItems, items]);
+    const newItems = items.filter((rect) => !rect.selected);
+    setItems(newItems);
+    setUndoStack([...undoStack, newItems]);
+  }, [items, undoStack]);
 
   const handleCopySelected = useCallback(() => {
     // Filter out selected rectangles and copy them to clipboard
@@ -581,31 +585,34 @@ const Whiteboard = () => {
           permanentSelection: false, // Deselect pasted rectangles
         };
       });
-      setItems((prevRectangles) =>
-        [...prevRectangles, ...pastedRectangles].map((rect) =>
-          pastedRectangles.some((pastRect) => pastRect.id === rect.id)
-            ? { ...rect, selected: true, permanentSelection: true }
-            : { ...rect, selected: false, permanentSelection: false }
-        )
+
+      const newItems = [...items, ...pastedRectangles].map((rect) =>
+        pastedRectangles.some((pastRect) => pastRect.id === rect.id)
+          ? { ...rect, selected: true, permanentSelection: true }
+          : { ...rect, selected: false, permanentSelection: false }
       );
+
+      setItems(newItems);
+      setUndoStack([...undoStack, newItems]);
     } catch (error) {
       console.error("Error parsing clipboard data:", error);
     }
-  }, [items, setItems]);
+  }, [items, undoStack]);
 
   const selectNextRect = useCallback(
     (e) => {
       const currRects = getCurrentRectangles(e);
       const smallestRect = getLargestRect(currRects, true);
       // Update the selected state of rectangles
-      let newIte = items.map((rect) => {
+      let newItems = items.map((rect) => {
         const selected = smallestRect && smallestRect.id === rect.id;
         return { ...rect, selected, permanentSelection: selected };
       });
 
-      setItems(newIte);
+      setItems(newItems);
+      setUndoStack([...undoStack, newItems]);
     },
-    [getCurrentRectangles, getLargestRect, items, setItems]
+    [getCurrentRectangles, getLargestRect, items, undoStack]
   );
 
   useEffect(() => {
