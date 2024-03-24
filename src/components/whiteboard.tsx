@@ -384,21 +384,13 @@ const Whiteboard = () => {
 
   const handleMouseUp = useCallback(() => {
     setDraggingView(false);
-
-    if (selecting) {
-      setSelecting(false);
-    }
-    if (dragging) {
-      setDragging(false);
-    }
-    if (resizeDirection) {
-      setResizeDirection(null);
-    }
-
+    setSelecting(false);
+    setDragging(false);
+    setResizeDirection(null);
     setStartPoint({ x: 0, y: 0 });
     setEndPoint({ x: 0, y: 0 });
     setUndoStack([...undoStack, items]);
-  }, [selecting, dragging, resizeDirection, undoStack, items]);
+  }, [undoStack, items]);
 
   const handleMouseMove = useCallback(
     (e) => {
