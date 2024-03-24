@@ -6,7 +6,7 @@ import React, {
   useLayoutEffect,
   useCallback,
 } from "react";
-import Button from "../components/button";
+import Button from "./button";
 import useWindowDimensions from "../hooks/use-window-dimensions";
 
 const Whiteboard = () => {
