@@ -216,15 +216,12 @@ const Whiteboard = () => {
         );
       });
 
-      console.log({ selectedRectangles });
-
       // Update selected state for rectangles
 
       return newItems.map((rect) => {
         const isSelected = selectedRectangles.some(
           (selRec) => selRec?.id === rect?.id
         );
-        console.log({ isSelected });
         return {
           ...rect,
           selected: isSelected,
@@ -234,8 +231,6 @@ const Whiteboard = () => {
     },
     [startPoint, endPoint, viewOffset, items]
   );
-
-  console.log(items);
 
   const handleSelectItem = useCallback(
     (e, mouseDown = false) => {
