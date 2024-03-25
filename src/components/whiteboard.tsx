@@ -65,7 +65,6 @@ const Whiteboard = () => {
   const [dragStartPoint, setDragStartPoint] = useState({ x: 0, y: 0 }); // Track start point of view dragging
   const [currIndexLayer, setCurrIndexLayer] = useState(0);
   const { width: innerWidth, height: innerHeight } = useWindowDimensions();
-
   const undo = useCallback(() => {
     if (undoStack.length > 0) {
       const previousState = undoStack.pop();
@@ -158,9 +157,10 @@ const Whiteboard = () => {
       const sortedRects = currRects.slice().sort((a, b) => {
         return b.width * b.height - a.width * a.height;
       });
-
-      const currRect = selectedRects.find(({ id }) =>
-        currRects.some(({ id: currRectId }) => id === currRectId)
+      const currRect = selectedRects.find(({ id, permanentSelection }) =>
+        currRects.some(
+          ({ id: currRectId }) => id === currRectId && permanentSelection
+        )
       );
 
       if (!doubleClick) {
@@ -169,6 +169,7 @@ const Whiteboard = () => {
             (sortedRect) => (currRect ?? sortedRects[0]).id === sortedRect.id
           )
         );
+
         return currRect ?? sortedRects[0];
       }
 
@@ -634,8 +635,8 @@ const Whiteboard = () => {
       });
 
       selectedRects.forEach((selectedRect) => {
-        ctx.strokeStyle = "gray";
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 1;
         ctx.setLineDash([3, 3]); // Adjust the numbers for different dash patterns
         ctx.strokeRect(
           selectedRect?.x + viewOffset.x,
@@ -648,7 +649,7 @@ const Whiteboard = () => {
 
       if (selecting) {
         ctx.strokeStyle = "black";
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1;
         ctx.strokeRect(
           startPoint?.x,
           startPoint?.y,
